@@ -1,0 +1,57 @@
+implementare due funzioni (tipo _Tx(x) e _Ty(y)) che passano dalle coordinate utente alle coordinate schermo senza ogni volta riscrivere tutta la trasformazione per i fattori di scala e i fattori di spostamento e rotazione e che ribalta automaticamente l'asse Y
+ovviamente dovranno essere funzioni membro di plotter per accedere alle variabili centro, scale e Xi,xf,yi,yf
+
+
+fare in modo che la trasformazione delle coordinate venga gestita da Windows con le librerie di grstione degli assi automatiche di default in windows (SetViewportExtEx e SetViewportOrgEx)
+
+
+stampare le griglie secondarie in scala automaticamente come i girafici di excel
+
+
+implementare un modo per rendere la finestra "Non-Modale" e che quindi non blocca la finestra chiamante ma che al contempo la finestra madre può decidere cosa far fare alla finestra figlia non-modale (pare che solo un dialogo può essere non-modale)
+
+
+dare l'opportunità al programma principale di decidere la dimensione della finestra
+
+
+opportunità di stampare più polilinee su uno stesso grafico con vari colori, spessori e tipi di linea definiti dall'utente ed eventualmente più grafici sulla finestra affiancati tra loro
+
+
+implementare un modo più intelligente di interfaccia visuale con l'opportunità di spostarsi son il mouse, zoomare con la rotellina (mannaggia) e fare altre cosette come un pulsante che ridimensiona gli assi automaticamente ai valori immessi
+
+
+aggiungere Menu alla finestra
+
+
+l'opportunità di salvare immagini o DXF del grafico presente a schermo
+
+
+mettere point invece che in una struct in una classe per poter usare i costruttori in modo intelligente tipo "setBoudaries( point(-2,5), point(12,30));"
+
+
+Impostare la schermata con tanti grafici stile "Layout" di Qt oppure minimap con tante sottofinestre con ognuna un grafico su cui ti puoi spostare individualmente con mouse 
+
+
+se clicchi sopra la linea ti dice il valore in quel punto
+Anche che mentre ti sposti con il mouse automaticamente si aggiornano sotto le coordinate del mouse in formato-dati
+
+
+per fare una libreria super riusabile dovrei mettere tutto dentro file .hpp o .h così da chiamare direttamente la libreria senza pensieri, sennò con le definizioni esterne ogni volta devo fare un progetto in c++;
+
+
+verso l'infinito e oltre!!! ovvero implementare il 3D!!!! (con openGL [che macello])
+
+
+aggiungere l'opzione per esportare in CSV
+
+
+se riuscissi a capire come usare i MDI dovrei fare che l'applicazione è MDI con all'interno una sottofinestra per ogni grafico. Ma i MDI sono un vero casino!! ma forse è un casino solo per il drag e pan, forse per visualizzare e basta va bene, ma a me servirebbe anche zoomare e modificare i grafici. Per ora infatti la scelta più veloce rimane quella di passare per excel
+
+
+Fareche accetta drag&drop per i file, sia all'apertura sia alla finestra (un po come il Visualizer)
+
+
+Fare tipo Oscilloscopio???
+che il programma gli inserisce i dati in tempo reale dentro e lui li fa vedere come se ci fosse uno strumento che li legge in tempo reale. Sarebbe molto utile per vedere ad esempio l'energia di un sistema simulato come evolve durante la simulazione....
+
+

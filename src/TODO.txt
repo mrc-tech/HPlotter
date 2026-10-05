@@ -1,0 +1,9 @@
+ - dare la possibilità di cambiare lo spessore e il colore delle linee con una specie di DIalog con le opzioni
+
+ - inserire la griglia (regolabile con delle opzioni) farla grigia e tratteggiata
+
+ - sistemare meglio i numeri che risultano un po troppo grossi e ingombranti ( i numeri dei limiti)
+
+ - Mouse che passandoci sopra ti dice il valore facendo lo "snap" alla curva
+
+ - 

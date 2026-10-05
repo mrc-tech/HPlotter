@@ -1,0 +1,26 @@
+#include "resource.h"
+#include <windows.h>
+
+IDC_MENU MENU
+{
+	POPUP	"&File"
+	{
+		MENUITEM	"&Export DXF",			IDM_DXF
+		MENUITEM	"E&xit",				IDM_EXIT
+	}
+	POPUP "&Help"
+	{
+		MENUITEM	"&About ...",	IDM_ABOUT
+	}
+}
+
+IDD_DIALOG DIALOG 0, 0, 150, 90
+STYLE DS_CENTER | WS_SYSMENU
+CAPTION "About"
+FONT 8, "MS Sans Serif"
+BEGIN
+	LTEXT	"HARRY PLOTTER", IDC_STATIC ,10,5,200,8
+	LTEXT	"Programma che disegna grafici", IDC_STATIC ,10,15,150,50
+	LTEXT	"Creato da: MARCHI TECHNOLOGY (c)", IDC_STATIC ,10,45,150,8,WS_DISABLED
+	DEFPUSHBUTTON	"OK",IDC_BUTTON,45,60,60,20
+END

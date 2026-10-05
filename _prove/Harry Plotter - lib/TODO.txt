@@ -1,0 +1,1 @@
+non legge i file di risorse .rc quindi il menu va creato tramite comandi nella fase di creazione della finestra

@@ -1,0 +1,1 @@
+il file di libreria libplotter.a si trova nella cartella del compilatore C:\Program Files (x86)\Dev-Cpp\MinGW64\x86_64-w64-mingw32\lib

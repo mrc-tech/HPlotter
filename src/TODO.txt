@@ -6,4 +6,4 @@
 
  - Mouse che passandoci sopra ti dice il valore facendo lo "snap" alla curva
 
- - 
+ - mettere la versione nell'about (con la convenzione standard)

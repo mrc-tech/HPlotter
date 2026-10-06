@@ -523,26 +523,31 @@ int Plotter::showWindow()
 	//Questa funzione carica automaticamente il hInstance senza che lo si debba specificare
 	HWND hWnd;
 	MSG msg;
-	WNDCLASS wndclass;
+	WNDCLASSEX wndclass;
 	
+	HINSTANCE hInst = (HINSTANCE)GetModuleHandle(NULL);
+	
+	wndclass.cbSize = sizeof(WNDCLASSEX);
 	wndclass.style = CS_HREDRAW | CS_VREDRAW;
 	wndclass.lpfnWndProc = this->StaticWndProc; //funziona perchè la funzione Callback è STATIC
 	wndclass.cbClsExtra = 0;
 	wndclass.cbWndExtra = 0;
-	wndclass.hInstance = (HINSTANCE)GetModuleHandle(NULL); //ritorna l'attuale hInstance
-	wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hInstance = hInst; //ritorna l'attuale hInstance
+    wndclass.hIcon = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_APP_ICON), IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR); // Icona grande (Barra delle applicazioni / Alt+Tab)
+    wndclass.hIconSm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_APP_ICON), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR); // Icona piccola (Barra del Titolo in alto a sinistra)
+//	wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION); // questo non carica l'icona (come prima)
 	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wndclass.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
 	wndclass.lpszMenuName = MAKEINTRESOURCE(IDC_MENU);
 	wndclass.lpszClassName = "WinApp";
 	
-	if (! RegisterClass(&wndclass))
+	if (! RegisterClassEx(&wndclass))
     {
 		MessageBox(NULL, "Could not create window.", "Error", 0);
 		return 0;
 	}
 	
-	hWnd = CreateWindow("winApp", "Harry Plotter", WS_OVERLAPPEDWINDOW,
+	hWnd = CreateWindow("WinApp", "Harry Plotter", WS_OVERLAPPEDWINDOW,
     					CW_USEDEFAULT,   CW_USEDEFAULT, 580, 500, NULL, NULL, GetModuleHandle(NULL), this); //deve mandare THIS!!!
       
 	

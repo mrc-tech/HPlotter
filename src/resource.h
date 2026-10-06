@@ -15,6 +15,7 @@
 #define IDC_CHECK_DARKMODE	111
 
 #define IDC_STATIC_TITLE	200 // per il titolo in grassetto dell'"About"
+#define IDI_APP_ICON		201 // icona applicazione
 
 
 #define IDC_STATIC_VERSION	900 // per la versione del programma

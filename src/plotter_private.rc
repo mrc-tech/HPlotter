@@ -5,8 +5,6 @@
 
 #include "resource.rc"
 
-A ICON "HPlotter.ico"
-
 //
 // TO CHANGE VERSION INFORMATION, EDIT PROJECT OPTIONS...
 //

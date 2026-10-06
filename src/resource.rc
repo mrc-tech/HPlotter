@@ -1,6 +1,8 @@
 #include <windows.h>
 #include "resource.h"
 
+IDI_APP_ICON ICON "HPlotter.ico"
+
 IDC_MENU MENU
 {
 	POPUP "&File"

@@ -34,6 +34,12 @@ class Plotter
 		
 		void plotCoord(bool b);
 		
+		// Metodi Getter e Setter per le opzioni
+		int getMargin() const { return margin; }
+		void setMargin(int m) { margin = m; }
+		bool isDarkMode() const { return darkMode; }
+		void setDarkMode(bool dark) { darkMode = dark; }
+		
 		int showWindow(HINSTANCE hInstance,int nCmdShow);
 		int showWindow();
 		void closeWindow();
@@ -57,6 +63,9 @@ class Plotter
 		int numvar; //usato per i grafici multipli da file
 		std::vector<std::string> varName; //nome delle variabili (usate nei grafici multipli da file)
 		std::vector<std::vector<point> > mdata; //dati multipli per più variabili ogni grafico
+		// OPZIONI:
+		int margin;
+		bool darkMode;
 	protected:
 		//Callback
 		static LRESULT CALLBACK StaticWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam); //funzione statica per evitare che aggiunga il parametro THIS

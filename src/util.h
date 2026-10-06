@@ -1,3 +1,6 @@
+#ifndef MRC_HPLOTTER_UTIL
+#define MRC_HPLOTTER_UTIL
+
 #include <vector>
 #include <string>
 
@@ -21,3 +24,5 @@ std::vector<std::string> splitTokens(std::string str,char c)
 	
 	return res;
 }
+
+#endif // MRC_HPLOTTER_UTIL

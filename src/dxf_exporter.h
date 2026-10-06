@@ -1,3 +1,6 @@
+#ifndef MRC_HPLOTTER_DXF_EXPORTER
+#define MRC_HPLOTTER_DXF_EXPORTER
+
 #include <vector>
 #include "plotter.h" //per la definizione delle variabili point
 #include <stdio.h> //per le operazioni di scrittura sul file (DEPRECATED)
@@ -43,3 +46,5 @@ int export_dxf(std::vector<point> data)
 	
 	return 0; //nessun errore
 }
+
+#endif // MRC_HPLOTTER_DXF_EXPORTER

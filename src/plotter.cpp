@@ -20,14 +20,18 @@ Plotter::Plotter()
 	this->miny = -1;
 	this->maxy = 1;
 	
-	//inizializzazione assi cartesiani
-	this->xi = 40;
-	this->xf = 400;
-	this->yi = 40;
-	this->yf = 400;
-	
 	//inizializzazione variabili di controllo
 	this->plotCoords = true;
+	
+	// OPZIONI:
+	margin = 40;        // Margine di default in pixel
+	darkMode = false;   // Tema chiaro di default
+	
+	//inizializzazione assi cartesiani
+	this->xi = margin;
+	this->xf = 400;
+	this->yi = margin;
+	this->yf = 400;
 }
 
 
@@ -386,6 +390,20 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 			//-----------------------------------------------------------------
 			//-----------------------------------------------------------------
 			
+			// ##########################################
+			// aggiunta da Gemini
+			
+//			// Esempio di utilizzo dei dati di 'plot' durante la ????????? / WM_PAINT
+//			int currentMargin = getMargin();
+//			bool isDark = isDarkMode();
+//			
+//			// Colore di sfondo e delle linee in base al tema
+//			COLORREF bgColor   = isDark ? RGB(30, 30, 30)   : RGB(255, 255, 255);
+//			COLORREF lineColor = isDark ? RGB(0, 255, 128)  : RGB(0, 0, 255);
+			
+			// ##########################################
+			
+			
 			
 			EndPaint(hwnd, &ps);
 			return 0;
@@ -399,6 +417,23 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 					else MessageBox(hwnd,"File scritto con successo.","",0);
 					break;
 				
+				case IDM_OPTIONS:
+				{ // parentesi graffe { ... } attorno al case IDM_OPTIONS: per evitare che la dichiarazione della variabile DisplayOptions opts crei conflitti di scope all'interno dello switch.
+					DisplayOptions opts;
+					opts.margin = this->getMargin();     // Recupera valore corrente
+					opts.darkMode = this->isDarkMode(); // Recupera stato corrente
+					
+					if (DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_OPTIONS_DIALOG), hwnd, OptionsProc, (LPARAM)&opts) == IDOK){
+			            this->setMargin(opts.margin);
+						this->setDarkMode(opts.darkMode);
+						RECT rc;
+						GetClientRect(hwnd, &rc);
+						setBoundaries(this->getMargin(), this->getMargin(), rc.right - this->getMargin(), rc.bottom - this->getMargin()); // setta i nuovi margini
+						InvalidateRect(hwnd, NULL, TRUE); // Forza il ridisegno della finestra con i nuovi parametri
+					}
+					break;
+				}
+				
 				case IDM_ABOUT:
 					DialogBox(0,MAKEINTRESOURCE(IDD_DIALOG),hwnd,(DLGPROC)AboutProc);
 					break;
@@ -410,7 +445,7 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 			return 0;
 		
 		case WM_SIZE:
-			setBoundaries(xi,yi,LOWORD(lParam)-40,HIWORD(lParam)-40);
+			setBoundaries(this->getMargin(), this->getMargin(), LOWORD(lParam) - this->getMargin(), HIWORD(lParam) - this->getMargin()); // setta i nuovi margini
 			return 0;
 			
 		case WM_DESTROY:

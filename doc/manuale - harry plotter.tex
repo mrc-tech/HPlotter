@@ -1,0 +1,51 @@
+\documentclass[a4paper]{article}
+
+\usepackage[italian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+
+\title{Harry Plotter}
+\author{Andrea Marchi}
+
+
+\begin{document}
+
+\maketitle
+
+
+
+\section{Convenzioni di lettura file}
+
+\textcolor{red}{cosa si aspetta di trovare dentro un file e i principali problemi che può incontrare: come un delimitatiore strano, virgola e non punto, etc etc..}
+
+\section{Convenzioni interne di stampa}
+
+\begin{tikzpicture}
+\draw[latex-latex] (0,-9)node[below]{$y$} -- (0,0) -- (11,0)node[below]{$x$};
+
+\draw [ultra thick] (0,0) rectangle (10,-8);
+\draw [thick] (1,-1) rectangle (9,-7);
+
+\draw[latex-] (1,-1) -- (1.5,-1.5) node[right]{$(x_i,y_i)$};
+\draw[latex-] (9,-7) -- (8.5,-6.5) node[left]{$(x_f,y_f)$};
+
+\draw[|<->|] (0,-2) -- node[below]{margin} (1,-2);
+\draw[|<->|] (2,0) -- node[right]{margin} (2,-1);
+\draw[|<->|] (2,-7) -- node[right]{margin} (2,-8);
+
+\draw[latex-] (3,-8) -- (3.2,-8.5) node[right]{bordo area disegno};
+\draw[latex-] (3,-7) -- (3.2,-6.5) node[right]{bordo plot};
+\end{tikzpicture}
+
+Inizialmente il margine è settato a 40 pixel. \textcolor{red}{programmare meglio questa cosa! nell'inizializzazione della finestra ancora ci sta un refuso: i 400 pixel di dimensione dipendono da quanto è grande la finestra...}
+
+\textcolor{red}{forse $x_i$ può essere chiamato $x_0$ e $x_f$ $x_1$. Ovviamente la $y$ di conseguenza.}
+
+\section{Opzioni}
+
+È possibile modificare il margine in pixel. \textcolor{red}{o forse sono unità di disegno??}
+
+\textcolor{red}{la "dark mode" non funziona.}
+
+
+\end{document}

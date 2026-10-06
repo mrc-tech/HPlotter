@@ -18,3 +18,6 @@ Harry Plotter
 - [ ] mettere opzioni tipo File->Apri, o anche che salva in altri formati oltre il DXF, come png, pdf, svg ....
 - [x] l'icona piccola (nel titolo della finestra) non è corretta. Forse devo modificare il file .ico (ancora non mi convince quella di sotto)
 - [ ] drag and drop dei file sulla schermata del programma per aprire il file
+- [ ] dare la possibilità di cambiare lo spessore e il colore delle linee con una specie di Dialog con le opzioni
+- [ ] sistemare meglio i numeri che risultano un po troppo grossi e ingombranti (i numeri dei limiti)
+- [ ] Mouse che passandoci sopra ti dice il valore facendo lo "snap" alla curva. Meglio come matplotlib

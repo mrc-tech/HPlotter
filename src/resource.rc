@@ -34,14 +34,16 @@ BEGIN
 END
 
 // Definizione del Dialog Opzioni
-IDD_OPTIONS_DIALOG DIALOG 0, 0, 180, 100
+IDD_OPTIONS_DIALOG DIALOG 0, 0, 180, 120
 STYLE DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Opzioni Visualizzazione"
 FONT 8, "MS Sans Serif"
 BEGIN
 	LTEXT			"Margine bordo (px):", IDC_STATIC, 10, 15, 80, 10
 	EDITTEXT		IDC_EDIT_MARGIN, 95, 12, 50, 12, ES_NUMBER
-	CONTROL			"Attiva Tema Scuro", IDC_CHECK_DARKMODE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 35, 120, 10
-	DEFPUSHBUTTON	"OK", IDOK, 35, 65, 50, 14
-	PUSHBUTTON		"Annulla", IDCANCEL, 95, 65, 50, 14
+	LTEXT			"Spessore linee (px):", IDC_STATIC, 10, 32, 80, 10
+	COMBOBOX		IDC_COMBO_LINE_WIDTH, 95, 29, 50, 80, WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP // Lo stile CBS_DROPDOWNLIST rende il menu non modificabile dall'utente. Inoltre, l'altezza (es. 80) deve includere lo spazio per l'apertura del menu a tendina.
+	CONTROL			"Attiva Tema Scuro", IDC_CHECK_DARKMODE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 52, 120, 10
+	DEFPUSHBUTTON	"OK", IDOK, 35, 85, 50, 14
+	PUSHBUTTON		"Annulla", IDCANCEL, 95, 85, 50, 14
 END

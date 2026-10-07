@@ -37,6 +37,8 @@ class Plotter
 		// Metodi Getter e Setter per le opzioni
 		int getMargin() const { return margin; }
 		void setMargin(int m) { margin = m; }
+		int getLineWidth() const { return lineWidth; }
+		void setLineWidth(int w) { lineWidth = w; }
 		bool isDarkMode() const { return darkMode; }
 		void setDarkMode(bool dark) { darkMode = dark; }
 		
@@ -59,13 +61,18 @@ class Plotter
 		//trasformazione delle coordinate
 		int Tx(double x);
 		int Ty(double y);
+        inline double InvTx(int px) const { return scalaX != 0 ? (px - centro.x) / scalaX : 0.0; } // Conversione inversa: da pixel schermo a coordinate del grafico
+        inline double InvTy(int py) const { return scalaY != 0 ? (centro.y - py) / scalaY : 0.0; }
 		//numero di variabili di cui fare il grafico
 		int numvar; //usato per i grafici multipli da file
 		std::vector<std::string> varName; //nome delle variabili (usate nei grafici multipli da file)
 		std::vector<std::vector<point> > mdata; //dati multipli per più variabili ogni grafico
 		// OPZIONI:
 		int margin;
+		int lineWidth;
 		bool darkMode;
+		
+		HWND hWndStatus; // Handle per la barra di stato
 	protected:
 		//Callback
 		static LRESULT CALLBACK StaticWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam); //funzione statica per evitare che aggiunga il parametro THIS

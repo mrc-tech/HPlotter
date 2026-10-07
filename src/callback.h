@@ -96,6 +96,7 @@ INT_PTR CALLBACK AboutProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 struct DisplayOptions {
     int margin;
     bool darkMode;
+    int lineWidth;
 };
 
 INT_PTR CALLBACK OptionsProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -109,6 +110,19 @@ INT_PTR CALLBACK OptionsProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (pOpts) {
             SetDlgItemInt(hwnd, IDC_EDIT_MARGIN, pOpts->margin, FALSE);
             CheckDlgButton(hwnd, IDC_CHECK_DARKMODE, pOpts->darkMode ? BST_CHECKED : BST_UNCHECKED);
+            // POPOLAMENTO COMBOBOX SPESSORE LINEA:
+			HWND hCombo = GetDlgItem(hwnd, IDC_COMBO_LINE_WIDTH);
+			const int allowedWidths[] = { 1, 2, 3, 4, 5, 8, 10 }; // Array con i valori predefiniti in pixel
+			int count = sizeof(allowedWidths) / sizeof(allowedWidths[0]);
+			int selectedIndex = 0;
+			for (int i = 0; i < count; i++) {
+				char label[16];
+				sprintf(label, "%d px", allowedWidths[i]);
+                int index = (int)SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)label); // Aggiunge la stringa al menu a tendina
+                SendMessage(hCombo, CB_SETITEMDATA, (WPARAM)index, (LPARAM)allowedWidths[i]); // Salva il valore numerico nell'item data del controllo
+                if (allowedWidths[i] == pOpts->lineWidth) selectedIndex = index; // Se corrisponde allo spessore attuale, salva l'indice per selezionarlo
+            }
+            SendMessage(hCombo, CB_SETCURSEL, (WPARAM)selectedIndex, 0); // Seleziona il valore corrente
         }
         return TRUE;
 
@@ -117,8 +131,13 @@ INT_PTR CALLBACK OptionsProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if (pOpts) {
                 pOpts->margin = GetDlgItemInt(hwnd, IDC_EDIT_MARGIN, NULL, FALSE);
                 pOpts->darkMode = (IsDlgButtonChecked(hwnd, IDC_CHECK_DARKMODE) == BST_CHECKED);
-            }
-            EndDialog(hwnd, IDOK);
+				// RECUPERO SPESSORE SELEZIONATO:
+				HWND hCombo = GetDlgItem(hwnd, IDC_COMBO_LINE_WIDTH);
+				int selIndex = (int)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
+                if (selIndex != CB_ERR) pOpts->lineWidth = (int)SendMessage(hCombo, CB_GETITEMDATA, (WPARAM)selIndex, 0); // Recupera il valore numerico salvato nell'itemdata
+                else pOpts->lineWidth = 1; // Fallback di sicurezza
+			}
+			EndDialog(hwnd, IDOK);
             return TRUE;
         }
         else if (LOWORD(wParam) == IDCANCEL) {

@@ -13,6 +13,7 @@
 #define IDD_OPTIONS_DIALOG	109
 #define IDC_EDIT_MARGIN		110
 #define IDC_CHECK_DARKMODE	111
+#define IDC_COMBO_LINE_WIDTH	112  // ID per l'input dello spessore delle linee
 
 #define IDC_STATIC_TITLE	200 // per il titolo in grassetto dell'"About"
 #define IDI_APP_ICON		201 // icona applicazione

@@ -2,6 +2,7 @@
 #include "resource.h"
 #include <windows.h>
 #include <winuser.h> //per il GWL_USERDATA
+#include <commctrl.h> // Per la Status Bar
 #include <cmath> //fabs()
 #include <stdio.h>
 #include <fstream>
@@ -22,9 +23,11 @@ Plotter::Plotter()
 	
 	//inizializzazione variabili di controllo
 	this->plotCoords = true;
+	hWndStatus = NULL; // Handle per la barra di stato
 	
 	// OPZIONI:
 	margin = 40;        // Margine di default in pixel
+	lineWidth = 2;		// spessore delle linee dei dati (pixel)
 	darkMode = false;   // Tema chiaro di default
 	
 	//inizializzazione assi cartesiani
@@ -250,9 +253,28 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 	switch (msg)
 	{
 		case WM_CREATE:
+			// Inizializza i controlli comuni
+			INITCOMMONCONTROLSEX icex;
+			icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+			icex.dwICC = ICC_BAR_CLASSES;
+			InitCommonControlsEx(&icex);
+			
+			// Crea la Status Bar in fondo alla finestra
+			this->hWndStatus = CreateWindowEx(
+				0,
+				STATUSCLASSNAME,
+				"Posiziona il mouse sul grafico per leggere le coordinate",
+				WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP,
+				0, 0, 0, 0,
+				hwnd,
+				(HMENU)1000,
+				GetModuleHandle(NULL),
+				NULL
+			);
 			return 0;
 		
 		case WM_PAINT:
+		{
 			HDC hDC;
 			PAINTSTRUCT ps;
 			HPEN hOldPen, hNewPen, hRedPen;
@@ -263,16 +285,16 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 			hRedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));   // Rosso
 			//colori dei grafici
 			HPEN grafico[MAX_COLOR];
-			grafico[0] = CreatePen(PS_SOLID,1,RGB(0,0,0)); //Nero
-			grafico[1] = CreatePen(PS_SOLID,1,RGB(255,0,0)); //Rosso
-			grafico[2] = CreatePen(PS_SOLID,1,RGB(0,0,255)); //Blu
-			grafico[3] = CreatePen(PS_SOLID,1,RGB(0,100,0)); //Verde
-			grafico[4] = CreatePen(PS_SOLID,1,RGB(0,255,255));
-			grafico[5] = CreatePen(PS_SOLID,1,RGB(0,0,0));
-			grafico[6] = CreatePen(PS_SOLID,1,RGB(0,0,0));
-			grafico[7] = CreatePen(PS_SOLID,1,RGB(0,0,0));
-			grafico[8] = CreatePen(PS_SOLID,1,RGB(0,0,0));
-			grafico[9] = CreatePen(PS_SOLID,1,RGB(0,0,0));
+			grafico[0] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,0)); //Nero
+			grafico[1] = CreatePen(PS_SOLID, this->lineWidth, RGB(255,0,0)); //Rosso
+			grafico[2] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,255)); //Blu
+			grafico[3] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,100,0)); //Verde
+			grafico[4] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,255,255));
+			grafico[5] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,0));
+			grafico[6] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,0));
+			grafico[7] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,0));
+			grafico[8] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,0));
+			grafico[9] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,0));
 			
 			
 			
@@ -303,40 +325,17 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 				LineTo(hDC, this->xf, this->centro.y);
 			}
 			//Scrive i limiti del rettangolo
-			if(fabs(this->maxx)< 0.01 && this->maxx != 0){
-				_set_output_format(_TWO_DIGIT_EXPONENT);
-				sprintf(buf,"%.02E",this->maxx);
-				TextOut(hDC, this->xf + 1, this->yf -16, buf, strlen(buf));
-			}else{
-				//usare SetTextAlign per allineare il testo ai bordi per maggiore precisione...
-				sprintf(buf,"%.02lf",this->maxx);
-				TextOut(hDC, this->xf + 1, this->yf -16, buf, strlen(buf));
-			}
-			if(fabs(this->maxy) < 0.01 && this->maxy != 0){
-				_set_output_format(_TWO_DIGIT_EXPONENT);
-				sprintf(buf,"%.02E",this->maxy);
-				TextOut(hDC, this->xi, this->yi - 16, buf, strlen(buf));
-			}else{
-				sprintf(buf,"%.02lf",this->maxy);
-				TextOut(hDC, this->xi, this->yi - 16, buf, strlen(buf));
-			}
-			if(fabs(this->minx) < 0.01 && this->minx != 0){
-				_set_output_format(_TWO_DIGIT_EXPONENT);
-				sprintf(buf,"%.02E",this->minx);
-				TextOut(hDC, this->xi - 40, this->yf - 16, buf, strlen(buf));
-			}else{
-				sprintf(buf,"%.02lf",this->minx);
-				//ruotare di 90° questo testo....
-				TextOut(hDC, this->xi - 40, this->yf - 16, buf, strlen(buf));
-			}
-			if(fabs(this->miny) < 0.01 && this->miny != 0){
-				_set_output_format(_TWO_DIGIT_EXPONENT);
-				sprintf(buf,"%.02E",this->miny);
-				TextOut(hDC, this->xi, this->yf + 1, buf, strlen(buf));
-			}else{
-				sprintf(buf,"%.02lf",this->miny);
-				TextOut(hDC, this->xi, this->yf + 1, buf, strlen(buf));
-			}
+			// Scrive i limiti del rettangolo del grafico
+			std::string strMaxX = formatNumber(this->maxx);
+			TextOut(hDC, this->xf + 1, this->yf - 16, strMaxX.c_str(), static_cast<int>(strMaxX.length()));
+			std::string strMaxY = formatNumber(this->maxy);
+			TextOut(hDC, this->xi, this->yi - 16, strMaxY.c_str(), static_cast<int>(strMaxY.length()));
+			std::string strMinX = formatNumber(this->minx);
+			TextOut(hDC, this->xi - 40, this->yf - 16, strMinX.c_str(), static_cast<int>(strMinX.length()));
+			std::string strMinY = formatNumber(this->miny);
+			TextOut(hDC, this->xi, this->yf + 1, strMinY.c_str(), static_cast<int>(strMinY.length()));
+			
+			
 			
 			hOldPen = (HPEN)SelectObject(hDC, hNewPen); //usa il grigio
 			
@@ -407,6 +406,7 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 			
 			EndPaint(hwnd, &ps);
 			return 0;
+		}
 			
 		case WM_COMMAND:
 			switch(LOWORD(wParam))
@@ -420,15 +420,28 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 				case IDM_OPTIONS:
 				{ // parentesi graffe { ... } attorno al case IDM_OPTIONS: per evitare che la dichiarazione della variabile DisplayOptions opts crei conflitti di scope all'interno dello switch.
 					DisplayOptions opts;
-					opts.margin = this->getMargin();     // Recupera valore corrente
+					opts.margin = this->getMargin(); // Recupera valore corrente
+					opts.lineWidth = this->getLineWidth(); // legge lo spessore delle linee
 					opts.darkMode = this->isDarkMode(); // Recupera stato corrente
 					
 					if (DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_OPTIONS_DIALOG), hwnd, OptionsProc, (LPARAM)&opts) == IDOK){
 			            this->setMargin(opts.margin);
+						this->setLineWidth(opts.lineWidth); // imposta il nuovo spessore
 						this->setDarkMode(opts.darkMode);
+						// Recupera l'area client della finestra:
 						RECT rc;
 						GetClientRect(hwnd, &rc);
-						setBoundaries(this->getMargin(), this->getMargin(), rc.right - this->getMargin(), rc.bottom - this->getMargin()); // setta i nuovi margini
+						// Calcola l'altezza della Status Bar (se presente):
+						int statusHeight = 0;
+						if (this->hWndStatus) {
+							RECT rcStatus = {0};
+							GetWindowRect(this->hWndStatus, &rcStatus);
+							statusHeight = rcStatus.bottom - rcStatus.top;
+						}
+						// 3. Calcola la dimensione utile sottraendo la barra di stato
+						int clientWidth = rc.right;
+						int clientHeight = rc.bottom - statusHeight;
+						setBoundaries(this->getMargin(), this->getMargin(), clientWidth - this->getMargin(), clientHeight - this->getMargin()); // setta i nuovi margini
 						InvalidateRect(hwnd, NULL, TRUE); // Forza il ridisegno della finestra con i nuovi parametri
 					}
 					break;
@@ -444,9 +457,45 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 			}
 			return 0;
 		
-		case WM_SIZE:
-			setBoundaries(this->getMargin(), this->getMargin(), LOWORD(lParam) - this->getMargin(), HIWORD(lParam) - this->getMargin()); // setta i nuovi margini
+		case WM_MOUSEMOVE:
+		{
+			int px = LOWORD(lParam);
+			int py = HIWORD(lParam);
+			
+			// Verifica se il cursore è all'interno del rettangolo (xi, yi, xf, yf)
+			if (px >= this->xi && px <= this->xf && py >= this->yi && py <= this->yf){
+				double x = InvTx(px);
+				double y = InvTy(py);
+				
+				char buf[128];
+//				sprintf(buf, "X: %.4g   Y: %.4g", x, y);
+				sprintf(buf, "X: %s   Y: %s", 
+	                formatNumber(x, 0.01, 10000.0).c_str(), 
+	                formatNumber(y, 0.01, 10000.0).c_str());
+				SendMessage(this->hWndStatus, SB_SETTEXT, 0, (LPARAM)buf);
+			}else{
+				SendMessage(this->hWndStatus, SB_SETTEXT, 0, (LPARAM)"Fuori dall'area del grafico");
+			}
 			return 0;
+		}
+		
+		case WM_SIZE:
+		{
+			if(this->hWndStatus) SendMessage(this->hWndStatus, WM_SIZE, 0, 0); // Ridimensiona la barra di stato
+			
+			// Recupera l'altezza della Status Bar per sottrarla dall'area utile del plot
+			RECT rcStatus = {0};
+			if(this->hWndStatus) GetWindowRect(this->hWndStatus, &rcStatus);
+			int statusHeight = rcStatus.bottom - rcStatus.top;
+			
+			int clientWidth = LOWORD(lParam);
+			int clientHeight = HIWORD(lParam) - statusHeight;
+			
+			// Aggiorna i confini del rettangolo di disegno tenendo conto dello spazio occupato dalla barra
+			setBoundaries(this->getMargin(), this->getMargin(), clientWidth - this->getMargin(), clientHeight - this->getMargin());
+			InvalidateRect(hwnd, NULL, TRUE);
+			return 0;
+		}
 			
 		case WM_DESTROY:
 			PostQuitMessage(0);

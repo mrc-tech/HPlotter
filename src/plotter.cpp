@@ -26,15 +26,15 @@ Plotter::Plotter()
 	hWndStatus = NULL; // Handle per la barra di stato
 	
 	// OPZIONI:
-	margin = 40;        // Margine di default in pixel
+	margin = 50;        // Margine di default in pixel
 	lineWidth = 2;		// spessore delle linee dei dati (pixel)
 	darkMode = false;   // Tema chiaro di default
 	
 	//inizializzazione assi cartesiani
 	this->xi = margin;
-	this->xf = 400;
+	this->xf = 440 - margin;
 	this->yi = margin;
-	this->yf = 400;
+	this->yf = 440 - margin;
 }
 
 
@@ -253,6 +253,7 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 	switch (msg)
 	{
 		case WM_CREATE:
+		{
 			// Inizializza i controlli comuni
 			INITCOMMONCONTROLSEX icex;
 			icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
@@ -272,19 +273,20 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 				NULL
 			);
 			return 0;
+		}
 		
 		case WM_PAINT:
 		{
 			HDC hDC;
 			PAINTSTRUCT ps;
-			HPEN hOldPen, hNewPen, hRedPen;
 			char buf[256];
 			
 			hDC = BeginPaint(hwnd, &ps);
-			hNewPen = CreatePen(PS_SOLID, 1, RGB(200, 200, 200));   // Grigio
-			hRedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));   // Rosso
-			//colori dei grafici
-			HPEN grafico[MAX_COLOR];
+			
+			// colori usati
+			HPEN hNewPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0)); // Nero
+			HPEN hRedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0)); // Rosso
+			HPEN grafico[MAX_COLOR]; // colori dei grafici
 			grafico[0] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,0)); //Nero
 			grafico[1] = CreatePen(PS_SOLID, this->lineWidth, RGB(255,0,0)); //Rosso
 			grafico[2] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,255)); //Blu
@@ -296,20 +298,27 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 			grafico[8] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,0));
 			grafico[9] = CreatePen(PS_SOLID, this->lineWidth, RGB(0,0,0));
 			
+			// Crea il font monospazio piccolo e a spessore normale
+			HFONT hSmallFont = CreateFont(
+				-11,                        // Altezza caratteri in pixel (es. -10 o -11 per un font piccolo)
+				0,                          // Larghezza media (0 = calcolata in automatico)
+				0, 0,                       // Angolo di inclinazione
+				FW_NORMAL,                  // Spessore normale (400) anziché FW_BOLD (700)
+				FALSE, FALSE, FALSE,        // Nessun corsivo, sottolineato o barrato
+				DEFAULT_CHARSET,            // Set di caratteri predefinito
+				OUT_DEFAULT_PRECIS,
+				CLIP_DEFAULT_PRECIS,
+				CLEARTYPE_QUALITY,          // Massima nitidezza del testo (ClearType)
+				FIXED_PITCH | FF_MODERN,    // Forza la larghezza fissa (monospazio)
+				"Consolas"                  // Nome del font (Consolas, Courier New, Lucida Console)
+			);
+			
+			// SALVATAGGIO DEGLI OGGETTI ORIGINALI DEL DC
+			HPEN hOldPen = (HPEN)SelectObject(hDC, hNewPen);
+			HFONT hOldFont = (HFONT)SelectObject(hDC, hSmallFont); // Seleziona il font nel DC e salva quello precedente
 			
 			
-			
-			//disegna il Box che contiene il plot
-//			MoveToEx(hDC, this->centro.x+(this->xi*this->scalaX), this->centro.y, NULL);
-//			LineTo(hDC, this->centro.x+(this->xf*this->scalaX), this->centro.y);
-//			MoveToEx(hDC, this->centro.x, this->centro.y-(this->yi*this->scalaY), NULL);
-//			LineTo(hDC, this->centro.x, this->centro.y-(this->yf*this->scalaY));
-			MoveToEx(hDC, this->xi, this->yi, NULL);
-			LineTo(hDC, this->xf, this->yi);
-			LineTo(hDC, this->xf, this->yf);
-			LineTo(hDC, this->xi, this->yf);
-			LineTo(hDC, this->xi, this->yi);
-			//Disegna gli assi
+			// Disegna gli assi (SARANNO SOTTO AL TRATTEGGIO DELLA GRIGLIA)
 			if(this->maxx*this->minx < 0){
 				//calcola il centro
 				this->centro.x = this->xi-this->minx*this->scalaX;
@@ -324,24 +333,78 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 				MoveToEx(hDC, this->xi, this->centro.y, NULL);
 				LineTo(hDC, this->xf, this->centro.y);
 			}
-			//Scrive i limiti del rettangolo
-			// Scrive i limiti del rettangolo del grafico
-			std::string strMaxX = formatNumber(this->maxx);
-			TextOut(hDC, this->xf + 1, this->yf - 16, strMaxX.c_str(), static_cast<int>(strMaxX.length()));
-			std::string strMaxY = formatNumber(this->maxy);
-			TextOut(hDC, this->xi, this->yi - 16, strMaxY.c_str(), static_cast<int>(strMaxY.length()));
-			std::string strMinX = formatNumber(this->minx);
-			TextOut(hDC, this->xi - 40, this->yf - 16, strMinX.c_str(), static_cast<int>(strMinX.length()));
-			std::string strMinY = formatNumber(this->miny);
-			TextOut(hDC, this->xi, this->yf + 1, strMinY.c_str(), static_cast<int>(strMinY.length()));
+			
+			// disegna i ticks con i numeri e la griglia ---------------------------------------------------
+			
+			SetBkMode(hDC, TRANSPARENT);
+			SetTextColor(hDC, RGB(0, 0, 0));
+			
+			// Prepara le penne per il disegno
+			HPEN hGridPen = CreatePen(PS_DOT, 1, RGB(200, 200, 200)); // Griglia grigio chiara tratteggiata
+			HPEN hAxisPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0)); // Assi e tick neri
+			
+			// Salva il colore del testo e il modo di sfondo
+			SetBkMode(hDC, TRANSPARENT);
+			SetTextColor(hDC, RGB(0, 0, 0));
+			
+			// --- TICKS & GRIGLIA ASSE X ---
+			std::vector<double> xTicks = generateNiceTicks(this->minx, this->maxx, 6);
+			SetTextAlign(hDC, TA_CENTER | TA_TOP); // Centra il testo sotto la tacchetta
+			
+			for (size_t i = 0; i < xTicks.size(); ++i) {
+				int px = Tx(xTicks[i]); // Converte in pixel schermo
+				
+				// A. Griglia verticale
+				SelectObject(hDC, hGridPen);
+				MoveToEx(hDC, px, this->yi, NULL);
+				LineTo(hDC, px, this->yf);
+				
+				// B. Tacchetta (Tick Mark) verso il basso sul bordo inferiore
+				SelectObject(hDC, hAxisPen);
+				MoveToEx(hDC, px, this->yf, NULL);
+				LineTo(hDC, px, this->yf + 5); // tacchetta lunga 5 pixel (DA METTERE IN OPZIONI?)
+				
+				// C. Etichetta numerica
+				std::string label = formatNumber(xTicks[i]);
+				TextOut(hDC, px, this->yf + 7, label.c_str(), static_cast<int>(label.length()));
+			}
+			
+			// --- TICKS & GRIGLIA ASSE Y ---
+			std::vector<double> yTicks = generateNiceTicks(this->miny, this->maxy, 6);
+			SetTextAlign(hDC, TA_RIGHT | TA_TOP); // Allinea a destra rispetto alla tacchetta
+			
+			for (size_t i = 0; i < yTicks.size(); ++i) {
+				int py = Ty(yTicks[i]); // Converte in pixel schermo
+				
+				// A. Griglia orizzontale
+				SelectObject(hDC, hGridPen);
+				MoveToEx(hDC, this->xi, py, NULL);
+				LineTo(hDC, this->xf, py);
+				
+				// B. Tacchetta (Tick Mark) verso sinistra sul bordo sinistro
+				SelectObject(hDC, hAxisPen);
+				MoveToEx(hDC, this->xi, py, NULL);
+				LineTo(hDC, this->xi - 5, py);
+				
+				// C. Etichetta numerica
+				std::string label = formatNumber(yTicks[i]);
+				TextOut(hDC, this->xi - 8, py - 6, label.c_str(), static_cast<int>(label.length())); // sottrae circa meta' altezza testo (6 pixel) per centrare il testo rispetto a TA_TOP
+			}
+			
+			// Pulizia oggetti GDI creati (penne per il disegno della griglia e i ticks)
+			DeleteObject(hGridPen);
+			DeleteObject(hAxisPen);
+			
+			// disegna il Box che contiene il plot
+			SelectObject(hDC, hNewPen);
+			MoveToEx(hDC, this->xi, this->yi, NULL);
+			LineTo(hDC, this->xf, this->yi);
+			LineTo(hDC, this->xf, this->yf);
+			LineTo(hDC, this->xi, this->yf);
+			LineTo(hDC, this->xi, this->yi);
 			
 			
 			
-			hOldPen = (HPEN)SelectObject(hDC, hNewPen); //usa il grigio
-			
-			//disegna le righe che compongono la griglia primaria			
-			
-			hOldPen = (HPEN)SelectObject(hDC, hRedPen); //usa il Rosso
 			
 			
 			//-----------------------------------------------------------------
@@ -403,6 +466,15 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 			// ##########################################
 			
 			
+			// RIPRISTINO DEGLI OGGETTI ORIGINALI NEL DC (FONDAMENTALE)
+			SelectObject(hDC, hOldPen);
+			SelectObject(hDC, hOldFont);
+			
+			// DISTRUZIONE DI TUTTE LE RISORSE CREATE
+			DeleteObject(hNewPen);
+			DeleteObject(hRedPen);
+			DeleteObject(hSmallFont);
+			for (int i = 0; i < MAX_COLOR; ++i) DeleteObject(grafico[i]);
 			
 			EndPaint(hwnd, &ps);
 			return 0;

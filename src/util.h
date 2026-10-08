@@ -28,7 +28,6 @@ std::vector<std::string> splitTokens(std::string str,char c)
 
 #include <cstdio>
 #include <cmath>
-#include <string>
 
 // per formattare i numeri (scientifici se troppo grandi o troppo piccoli)
 // in realta' posso fare piu' semplicemente con "%g", anche se ho meno controllo
@@ -47,5 +46,44 @@ inline std::string formatNumber(double val, double smallThresh = 0.01, double la
 	
 	return std::string(buf);
 }
+
+
+// Trova un numero "bello" vicino a x [Paul Heckbert (Graphics Gems)]
+inline double niceNum(double x, bool round)
+{
+	int exp = static_cast<int>(std::floor(std::log10(x)));
+	double f = x / std::pow(10.0, exp); // frazione tra 1 e 10
+	double niceF;
+	if(round){
+		if (f < 1.5) niceF = 1.0;
+		else if (f < 3.0) niceF = 2.0;
+		else if (f < 7.0) niceF = 5.0;
+		else niceF = 10.0;
+	}else{
+		if (f <= 1.0) niceF = 1.0;
+		else if (f <= 2.0) niceF = 2.0;
+		else if (f <= 5.0) niceF = 5.0;
+		else niceF = 10.0;
+	}
+	return niceF * std::pow(10.0, exp);
+}
+
+// Genera il vettore di posizioni per i tick [Paul Heckbert (Graphics Gems)]
+inline std::vector<double> generateNiceTicks(double minVal, double maxVal, int maxTicks = 6)
+{
+	std::vector<double> ticks;
+	if (minVal >= maxVal) return ticks;
+	
+	double range = niceNum(maxVal - minVal, false);
+	double tickSpacing = niceNum(range / (maxTicks - 1), true);
+	double graphMin = std::floor(minVal / tickSpacing) * tickSpacing;
+	double graphMax = std::ceil(maxVal / tickSpacing) * tickSpacing;
+	
+	for (double x = graphMin; x <= graphMax + (tickSpacing * 0.5); x += tickSpacing) {
+		if (x >= minVal - 1e-9 && x <= maxVal + 1e-9) ticks.push_back(x);
+	}
+	return ticks;
+}
+
 
 #endif // MRC_HPLOTTER_UTIL

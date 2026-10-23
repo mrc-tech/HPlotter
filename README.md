@@ -1,6 +1,8 @@
 # HPlotter
 Harry Plotter
 
+<img width="568" height="495" alt="HP" src="doc/HP.png" />
+
 
 ## ToDo
 

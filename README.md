@@ -15,6 +15,8 @@ Harry Plotter
 	- [ ] griglia (principale e secondaria)
 	- [ ] legenda
 	- [ ] lineplot o scatter
+	- [ ] label assi
+	- [ ] dimensione grafico (cambia la dimensione della finestra)
 - [ ] mi piacerebbe poter compilare anche una versione per _linux_. Anche se lo vedo difficile, dato che questo codice è specializzato per windows.
 - [ ] vede automaticamente se la prima riga sono delle lettere, in caso le considera come label dei dati.
 - [ ] le righe che iniziano con "#" sono dei commenti e non vengono considerate
@@ -26,4 +28,4 @@ Harry Plotter
 - [x] sistemare meglio i numeri che risultano un po troppo grossi e ingombranti (i numeri dei limiti)
 - [x] Mouse che passandoci sopra ti dice il valore facendo lo "snap" alla curva. Meglio come matplotlib (coordinate nella barra di controllo inferiore)
 - [ ] fare i ticks piu' omogenei e mettere il moltiplicatore 10^x da un lato, in caso di numeri grandi o piccoli
-- [ ] la griglia in corrispondenza del bordo del grafico qualche volta viene plottata un pixel fuori dai limiti del grafico.
+- [x] la griglia in corrispondenza del bordo del grafico qualche volta viene plottata un pixel fuori dai limiti del grafico.

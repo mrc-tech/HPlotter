@@ -353,6 +353,9 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 			
 			for (size_t i = 0; i < xTicks.size(); ++i) {
 				int px = Tx(xTicks[i]); // Converte in pixel schermo
+				if(px < this->xi) px = this->xi; // evita che sia minore   del box del grafico
+				if(px > this->xf) px = this->xf; // evita che sia maggiore del box del grafico
+				// DOVREI FARE CHE SE LA DIFFERENZA E' UN PIXEL CONSIDERA UGUALE AL MASSIMO (per evitare che sia minore di un pixel)
 				
 				// A. Griglia verticale
 				SelectObject(hDC, hGridPen);
@@ -375,6 +378,9 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 			
 			for (size_t i = 0; i < yTicks.size(); ++i) {
 				int py = Ty(yTicks[i]); // Converte in pixel schermo
+				if(py < this->yi) py = this->yi; // evita che sia minore   del box del grafico
+				if(py > this->yf) py = this->yf; // evita che sia maggiore del box del grafico
+				// DOVREI FARE CHE SE LA DIFFERENZA E' UN PIXEL CONSIDERA UGUALE AL MASSIMO (per evitare che sia minore di un pixel)
 				
 				// A. Griglia orizzontale
 				SelectObject(hDC, hGridPen);

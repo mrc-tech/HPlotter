@@ -21,10 +21,10 @@ Harry Plotter
 - [ ] vede automaticamente se la prima riga sono delle lettere, in caso le considera come label dei dati.
 - [ ] le righe che iniziano con "#" sono dei commenti e non vengono considerate
 - [ ] file troppo grandi potrebbero rallentare notevolmente il programma: fare che prende solamente alcuni dati dai file, ovvero solamente quelli necessari a disegnare un grafico
-- [ ] mettere opzioni tipo File--Apri
+- [x] mettere opzioni tipo File--Apri
+- [ ] drag and drop dei file sulla schermata del programma per aprire il file
 - [ ] anche che salva in altri formati oltre il DXF, come png, pdf, svg ....
 - [x] l'icona piccola (nel titolo della finestra) non è corretta. Forse devo modificare il file .ico (ancora non mi convince quella di sotto)
-- [ ] drag and drop dei file sulla schermata del programma per aprire il file
 - [x] dare la possibilità di cambiare lo spessore e il colore delle linee con una specie di Dialog con le opzioni
 - [x] sistemare meglio i numeri che risultano un po troppo grossi e ingombranti (i numeri dei limiti)
 - [x] Mouse che passandoci sopra ti dice il valore facendo lo "snap" alla curva. Meglio come matplotlib (coordinate nella barra di controllo inferiore)

@@ -20,7 +20,7 @@ class Plotter
 		void freeData();
 		void addItem(point pt);
 		void addItem(double x,double y);
-		void addFile(std::string filename); //prende i dati da file formattati
+		void addFile(std::string filename); // prende i dati da file formattati
 		
 		void autoSize();
 		void updateAxis();
@@ -46,27 +46,27 @@ class Plotter
 		int showWindow();
 		void closeWindow();
 	private:
-		//DATI
+		// DATI
 		std::vector<point> data;
-		//valori massimi dei dati
+		// valori massimi dei dati
 		double minx,maxx,miny,maxy;		
-		//variabili per convertire in coordinate schermo
-		double xi,xf,yi,yf; //limiti del rettagolo plottato
-		point centro; //centro O degli assi
-		double scalaX, scalaY; //scala degli assi X e Y
-		//vaiabili di controllo
+		// variabili per convertire in coordinate schermo
+		double xi,xf,yi,yf; // limiti del rettagolo plottato
+		point centro; // centro O degli assi
+		double scalaX, scalaY; // scala degli assi X e Y
+		// vaiabili di controllo
 		bool plotCoords;
-		//FUNZIONI
+		// FUNZIONI
 		void updateAxis(double xmin,double ymin,double xmax,double ymax);
-		//trasformazione delle coordinate
+		// trasformazione delle coordinate
 		int Tx(double x);
 		int Ty(double y);
         inline double InvTx(int px) const { return scalaX != 0 ? (px - centro.x) / scalaX : 0.0; } // Conversione inversa: da pixel schermo a coordinate del grafico
         inline double InvTy(int py) const { return scalaY != 0 ? (centro.y - py) / scalaY : 0.0; }
-		//numero di variabili di cui fare il grafico
-		int numvar; //usato per i grafici multipli da file
-		std::vector<std::string> varName; //nome delle variabili (usate nei grafici multipli da file)
-		std::vector<std::vector<point> > mdata; //dati multipli per più variabili ogni grafico
+		// numero di variabili di cui fare il grafico
+		int numvar; // usato per i grafici multipli da file
+		std::vector<std::string> varName; // nome delle variabili (usate nei grafici multipli da file)
+		std::vector<std::vector<point> > mdata; // dati multipli per più variabili ogni grafico
 		// OPZIONI:
 		int margin;
 		int lineWidth;
@@ -74,7 +74,7 @@ class Plotter
 		
 		HWND hWndStatus; // Handle per la barra di stato
 	protected:
-		//Callback
-		static LRESULT CALLBACK StaticWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam); //funzione statica per evitare che aggiunga il parametro THIS
-		LRESULT CALLBACK WndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam); //reale funzione della finestra che può accedere ai dati della classe
+		// Callback
+		static LRESULT CALLBACK StaticWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam); // funzione statica per evitare che aggiunga il parametro THIS
+		LRESULT CALLBACK WndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam); // reale funzione della finestra che può accedere ai dati della classe
 };

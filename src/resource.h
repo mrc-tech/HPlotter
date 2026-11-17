@@ -8,6 +8,7 @@
 #define IDC_STATIC			105
 #define IDC_BUTTON			106
 #define IDM_DXF				107
+#define IDM_OPEN			1001
 
 #define IDM_OPTIONS			108 // menu opzioni
 #define IDD_OPTIONS_DIALOG	109

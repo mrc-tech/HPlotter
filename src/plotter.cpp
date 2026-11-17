@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <winuser.h> //per il GWL_USERDATA
 #include <commctrl.h> // Per la Status Bar
+#include <commdlg.h> // Per GetOpenFileName
 #include <cmath> //fabs()
 #include <stdio.h>
 #include <fstream>
@@ -52,7 +53,10 @@ void Plotter::insertData(std::vector<point> pts)
 
 void Plotter::freeData()
 {
-	
+	// importante questa funzione se voglio aprire dei dati nuovi, tramite File->Apri
+	this->data.clear(); // elimina i dati
+	this->mdata.clear(); // elimina i dati delle colonne diverse dalla prima (COME MAI AVEVO FATTO IN QUESTO MODO?)
+	this->varName.clear(); // elimina i nomi delle colonne
 }
 
 
@@ -489,6 +493,36 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 		case WM_COMMAND:
 			switch(LOWORD(wParam))
 			{
+				case IDM_OPEN:
+				{
+					OPENFILENAME ofn;
+					char szFile[260] = {0};
+					
+					// Inizializza la struttura OPENFILENAME
+					ZeroMemory(&ofn, sizeof(ofn));
+					ofn.lStructSize = sizeof(ofn);
+					ofn.hwndOwner = hwnd;
+					ofn.lpstrFile = szFile;
+					ofn.nMaxFile = sizeof(szFile);
+//					ofn.lpstrFilter = "File Testo (*.txt)\0*.txt\0Tutti i file (*.*)\0*.*\0";
+					ofn.lpstrFilter = "Tutti i file (*.*)\0*.*\0";
+					ofn.nFilterIndex = 1;
+					ofn.lpstrFileTitle = NULL;
+					ofn.nMaxFileTitle = 0;
+					ofn.lpstrInitialDir = NULL;
+					ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+					
+					// Mostra la finestra di dialogo "Apri"
+					if (GetOpenFileName(&ofn) == TRUE)
+					{
+						this->freeData();          // Pulisce i dati precedenti
+						this->addFile(ofn.lpstrFile); // Carica il nuovo file
+						this->autoSize();          // Ricalcola i limiti
+						InvalidateRect(hwnd, NULL, TRUE); // Forza il ridisegno del grafico
+					}
+					break;
+				}
+				
 				case IDM_DXF:
 					//salva in DXF
 					if(export_dxf(this->data)) MessageBox(hwnd,"Errore Esportazione File","ERRORE",0);

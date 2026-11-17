@@ -24,6 +24,10 @@ Harry Plotter
 - [x] mettere opzioni tipo File--Apri
 - [x] drag and drop dei file sulla schermata del programma per aprire il file
 - [ ] anche che salva in altri formati oltre il DXF, come png, pdf, svg ....
+	- [x] PNG
+	- [ ] SVG
+	- [ ] PDF
+	- [ ] 
 - [x] l'icona piccola (nel titolo della finestra) non è corretta. Forse devo modificare il file .ico (ancora non mi convince quella di sotto)
 - [x] dare la possibilità di cambiare lo spessore e il colore delle linee con una specie di Dialog con le opzioni
 - [x] sistemare meglio i numeri che risultano un po troppo grossi e ingombranti (i numeri dei limiti)

@@ -14,6 +14,29 @@
 
 #define MAX_COLOR 10
 
+// per il GDI+ (esportare in PNG)
+#include <objidl.h>
+#include <gdiplus.h>
+using namespace Gdiplus;
+
+// Funzione helper per trovare l'encoder per salvare in PNG
+int GetEncoderClsid(const WCHAR* format, CLSID* pClsid) {
+    UINT num = 0, size = 0;
+    GetImageEncodersSize(&num, &size);
+    if(size == 0) return -1;
+    ImageCodecInfo* pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+    if(pImageCodecInfo == NULL) return -1;
+    GetImageEncoders(num, size, pImageCodecInfo);
+    for(UINT j = 0; j < num; ++j) {
+        if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 ) {
+            *pClsid = pImageCodecInfo[j].Clsid;
+            free(pImageCodecInfo);
+            return j;
+        }
+    }
+    free(pImageCodecInfo);
+    return -1;
+}
 
 
 Plotter::Plotter()
@@ -532,6 +555,70 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 					if(export_dxf(this->data)) MessageBox(hwnd,"Errore Esportazione File","ERRORE",0);
 					else MessageBox(hwnd,"File scritto con successo.","",0);
 					break;
+				
+				case IDM_EXPORT_PNG:
+				{
+				    OPENFILENAME ofn;
+				    char szFile[260] = "Figura.png";
+				
+				    ZeroMemory(&ofn, sizeof(ofn));
+				    ofn.lStructSize = sizeof(ofn);
+				    ofn.hwndOwner = hwnd;
+				    ofn.lpstrFile = szFile;
+				    ofn.nMaxFile = sizeof(szFile);
+				    ofn.lpstrFilter = "Immagine PNG (*.png)\0*.png\0";
+				    ofn.nFilterIndex = 1;
+				    ofn.lpstrDefExt = "png";
+				    ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+				
+				    if (GetSaveFileName(&ofn) == TRUE)
+				    {
+				        // Forza un ridisegno per rimuovere "fantasmi" del dialog appena chiuso
+				        UpdateWindow(hwnd); 
+				
+				        // Calcola l'area della finestra escludendo la Status Bar
+				        RECT rc;
+				        GetClientRect(hwnd, &rc);
+				        int statusHeight = 0;
+				        if (this->hWndStatus) {
+				            RECT rcStatus;
+				            GetWindowRect(this->hWndStatus, &rcStatus);
+				            statusHeight = rcStatus.bottom - rcStatus.top;
+				        }
+				        int imgWidth = rc.right;
+				        int imgHeight = rc.bottom - statusHeight;
+				
+				        // Cattura il Device Context (DC) in un HBITMAP virtuale in memoria
+				        HDC hdcScreen = GetDC(hwnd);
+				        HDC hdcMem = CreateCompatibleDC(hdcScreen);
+				        HBITMAP hbmMem = CreateCompatibleBitmap(hdcScreen, imgWidth, imgHeight);
+				        HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+				
+				        // Copia i pixel dal DC reale al DC virtuale
+				        BitBlt(hdcMem, 0, 0, imgWidth, imgHeight, hdcScreen, 0, 0, SRCCOPY);
+				
+				        // GDI+ richiede stringhe Unicode (WCHAR) per i percorsi dei file
+				        WCHAR wFilePath[260];
+				        MultiByteToWideChar(CP_ACP, 0, ofn.lpstrFile, -1, wFilePath, 260);
+				
+				        // Procedura di salvataggio del bitmap con GDI+
+				        Gdiplus::Bitmap bitmap(hbmMem, NULL);
+				        CLSID pngClsid;
+				        if (GetEncoderClsid(L"image/png", &pngClsid) != -1) {
+				            bitmap.Save(wFilePath, &pngClsid, NULL);
+				            MessageBox(hwnd, "Esportazione completata con successo!", "Export", MB_OK);
+				        } else {
+				            MessageBox(hwnd, "Errore nella codifica PNG.", "Errore", MB_OK | MB_ICONERROR);
+				        }
+				
+				        // Libera tutta la memoria (Cruciale in C++)
+				        SelectObject(hdcMem, hbmOld);
+				        DeleteObject(hbmMem);
+				        DeleteDC(hdcMem);
+				        ReleaseDC(hwnd, hdcScreen);
+				    }
+				    break;
+				}
 				
 				case IDM_OPTIONS:
 				{ // parentesi graffe { ... } attorno al case IDM_OPTIONS: per evitare che la dichiarazione della variabile DisplayOptions opts crei conflitti di scope all'interno dello switch.

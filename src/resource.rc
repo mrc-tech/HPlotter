@@ -8,7 +8,13 @@ IDC_MENU MENU
 	POPUP "&File"
 	{
 		MENUITEM	"&Apri...",		IDM_OPEN
-		MENUITEM	"&Export DXF",	IDM_DXF
+		MENUITEM	SEPARATOR
+		POPUP		"Esporta"
+		BEGIN
+			MENUITEM "&PNG...",		IDM_EXPORT_PNG
+//	    	MENUITEM "&DXF...",		IDM_DXF
+		END
+		MENUITEM	SEPARATOR
 		MENUITEM	"E&xit",		IDM_EXIT
 	}
 	POPUP "&Visualizza"

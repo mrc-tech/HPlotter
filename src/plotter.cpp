@@ -4,6 +4,7 @@
 #include <winuser.h> //per il GWL_USERDATA
 #include <commctrl.h> // Per la Status Bar
 #include <commdlg.h> // Per GetOpenFileName
+#include <shellapi.h> // abilita le API della shell di Windows per il drag&drop
 #include <cmath> //fabs()
 #include <stdio.h>
 #include <fstream>
@@ -258,6 +259,9 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 	{
 		case WM_CREATE:
 		{
+			// Abilita il drag & drop sulla finestra
+			DragAcceptFiles(hwnd, TRUE);
+			
 			// Inizializza i controlli comuni
 			INITCOMMONCONTROLSEX icex;
 			icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
@@ -606,6 +610,29 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 			// Aggiorna i confini del rettangolo di disegno tenendo conto dello spazio occupato dalla barra
 			setBoundaries(this->getMargin(), this->getMargin(), clientWidth - this->getMargin(), clientHeight - this->getMargin());
 			InvalidateRect(hwnd, NULL, TRUE);
+			return 0;
+		}
+		
+		case WM_DROPFILES:
+		{
+			HDROP hDrop = (HDROP)wParam;
+			char szFilePath[MAX_PATH];
+			
+			UINT fileCount = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0); // Verifica quanti file sono stati trascinati
+			
+			if (fileCount > 0)
+			{
+				DragQueryFile(hDrop, 0, szFilePath, MAX_PATH); // Estrae il percorso del primo file rilasciato (indice 0)
+				
+				// Pulisce i dati precedenti, carica il nuovo file e aggiorna
+				this->freeData(); 
+				this->addFile(szFilePath);
+				this->autoSize();
+				
+				InvalidateRect(hwnd, NULL, TRUE); // Forza il ridisegno della finestra
+			}
+			
+			DragFinish(hDrop); // Libera le risorse allocate da Windows per il drag&drop
 			return 0;
 		}
 			

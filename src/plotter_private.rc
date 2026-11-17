@@ -9,8 +9,8 @@
 // TO CHANGE VERSION INFORMATION, EDIT PROJECT OPTIONS...
 //
 1 VERSIONINFO
-FILEVERSION 1,0,0,4
-PRODUCTVERSION 1,0,0,4
+FILEVERSION 1,0,0,5
+PRODUCTVERSION 1,0,0,5
 FILETYPE VFT_APP
 {
   BLOCK "StringFileInfo"
@@ -18,14 +18,14 @@ FILETYPE VFT_APP
     BLOCK "041004E4"
     {
       VALUE "CompanyName", "Marchi Technology"
-      VALUE "FileVersion", "1.0.0.4"
+      VALUE "FileVersion", "1.0.0.5"
       VALUE "FileDescription", "Plot data from ASCII files"
       VALUE "InternalName", ""
       VALUE "LegalCopyright", "Marchi Technology"
       VALUE "LegalTrademarks", "Marchi Technology"
       VALUE "OriginalFilename", "HPlotter"
       VALUE "ProductName", "Harry Plotter"
-      VALUE "ProductVersion", "1.0.0.4"
+      VALUE "ProductVersion", "1.0.0.5"
     }
   }
   BLOCK "VarFileInfo"

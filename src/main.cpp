@@ -6,7 +6,7 @@
 #include <fstream>
 #include <vector>
 
-// questi tre in questo ordine:
+// questi tre in questo ordine, altrimenti GDI+ non funziona su compilatori tipo MinGW:
 #include <windows.h>
 #include <objidl.h>
 #include <gdiplus.h> // GDI+ (per esportare in immagine il DC)

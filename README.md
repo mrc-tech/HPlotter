@@ -17,6 +17,7 @@ Harry Plotter
 	- [ ] lineplot o scatter
 	- [ ] label assi
 	- [ ] dimensione grafico (cambia la dimensione della finestra)
+	- [ ] mettere le opzioni booleane (come il tema scuro) direttamente nel menu "Visualizza" e nel dialogo solo i numeri o testo delle opzioni, liste etc.
 - [ ] mi piacerebbe poter compilare anche una versione per _linux_. Anche se lo vedo difficile, dato che questo codice è specializzato per windows.
 - [ ] vede automaticamente se la prima riga sono delle lettere, in caso le considera come label dei dati.
 - [ ] le righe che iniziano con "#" sono dei commenti e non vengono considerate
@@ -25,9 +26,8 @@ Harry Plotter
 - [x] drag and drop dei file sulla schermata del programma per aprire il file
 - [ ] anche che salva in altri formati oltre il DXF, come png, pdf, svg ....
 	- [x] PNG
-	- [ ] SVG
+	- [x] SVG
 	- [ ] PDF
-	- [ ] 
 - [x] l'icona piccola (nel titolo della finestra) non è corretta. Forse devo modificare il file .ico (ancora non mi convince quella di sotto)
 - [x] dare la possibilità di cambiare lo spessore e il colore delle linee con una specie di Dialog con le opzioni
 - [x] sistemare meglio i numeri che risultano un po troppo grossi e ingombranti (i numeri dei limiti)

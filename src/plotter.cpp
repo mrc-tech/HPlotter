@@ -620,6 +620,41 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 				    break;
 				}
 				
+				case IDM_EXPORT_SVG:
+				{
+				    OPENFILENAME ofn;
+				    char szFile[260] = "Figura.svg";
+				
+				    ZeroMemory(&ofn, sizeof(ofn));
+				    ofn.lStructSize = sizeof(ofn);
+				    ofn.hwndOwner = hwnd;
+				    ofn.lpstrFile = szFile;
+				    ofn.nMaxFile = sizeof(szFile);
+				    ofn.lpstrFilter = "Immagine Vettoriale SVG (*.svg)\0*.svg\0";
+				    ofn.nFilterIndex = 1;
+				    ofn.lpstrDefExt = "svg";
+				    ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+				
+				    if (GetSaveFileName(&ofn) == TRUE)
+				    {
+				        // Calcola larghezza e altezza escludendo la Status Bar
+				        RECT rc;
+				        GetClientRect(hwnd, &rc);
+				        int statusHeight = 0;
+				        if (this->hWndStatus) {
+				            RECT rcStatus;
+				            GetWindowRect(this->hWndStatus, &rcStatus);
+				            statusHeight = rcStatus.bottom - rcStatus.top;
+				        }
+				        
+				        // Chiama la nostra nuova funzione che scrive il file
+				        this->exportToSVG(ofn.lpstrFile, rc.right, rc.bottom - statusHeight);
+				        
+				        MessageBox(hwnd, "Esportazione SVG completata con successo!", "Export Vettoriale", MB_OK);
+				    }
+				    break;
+				}
+				
 				case IDM_OPTIONS:
 				{ // parentesi graffe { ... } attorno al case IDM_OPTIONS: per evitare che la dichiarazione della variabile DisplayOptions opts crei conflitti di scope all'interno dello switch.
 					DisplayOptions opts;
@@ -730,6 +765,104 @@ LRESULT CALLBACK Plotter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 	}
 	
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+
+void Plotter::exportToSVG(const char* filepath, int width, int height)
+{
+    std::ofstream svg(filepath);
+    if (!svg.is_open()) return;
+
+    // Intestazione standard di un file SVG
+    svg << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
+    svg << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" ";
+    svg << "width=\"" << width << "\" height=\"" << height << "\" ";
+    svg << "viewBox=\"0 0 " << width << " " << height << "\">\n";
+
+    // 1. Sfondo bianco
+    svg << "  <rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n";
+
+    // 2. Disegna gli Assi centrali (se visibili)
+    if(this->maxx * this->minx < 0){
+        svg << "  <line x1=\"" << Tx(0) << "\" y1=\"" << this->yi 
+            << "\" x2=\"" << Tx(0) << "\" y2=\"" << this->yf 
+            << "\" stroke=\"black\" stroke-width=\"1\"/>\n";
+    }
+    if(this->maxy * this->miny < 0){
+        svg << "  <line x1=\"" << this->xi << "\" y1=\"" << Ty(0) 
+            << "\" x2=\"" << this->xf << "\" y2=\"" << Ty(0) 
+            << "\" stroke=\"black\" stroke-width=\"1\"/>\n";
+    }
+    
+    // --- 3. TICKS E GRIGLIA ASSE X ---
+    std::vector<double> xTicks = generateNiceTicks(this->minx, this->maxx, 6);
+    for (size_t i = 0; i < xTicks.size(); ++i) {
+        int px = Tx(xTicks[i]);
+        if(px < this->xi) px = this->xi;
+        if(px > this->xf) px = this->xf;
+
+        // Griglia verticale (grigio, tratteggiata)
+        svg << "  <line x1=\"" << px << "\" y1=\"" << this->yi << "\" x2=\"" << px << "\" y2=\"" << this->yf 
+            << "\" stroke=\"rgb(200,200,200)\" stroke-width=\"1\" stroke-dasharray=\"4,4\"/>\n";
+
+        // Tacchetta verso il basso
+        svg << "  <line x1=\"" << px << "\" y1=\"" << this->yf << "\" x2=\"" << px << "\" y2=\"" << this->yf + 5 
+            << "\" stroke=\"black\" stroke-width=\"1\"/>\n";
+
+        // Etichetta numerica (allineata al centro sotto la tacca)
+        std::string label = formatNumber(xTicks[i]);
+        // y è sfalsato di circa 18px per far scendere la baseline del testo sotto l'asse
+        svg << "  <text x=\"" << px << "\" y=\"" << this->yf + 18 
+            << "\" font-family=\"Consolas, monospace\" font-size=\"11\" text-anchor=\"middle\" fill=\"black\">" 
+            << label << "</text>\n";
+    }
+
+    // --- 4. TICKS E GRIGLIA ASSE Y ---
+    std::vector<double> yTicks = generateNiceTicks(this->miny, this->maxy, 6);
+    for (size_t i = 0; i < yTicks.size(); ++i) {
+        int py = Ty(yTicks[i]);
+        if(py < this->yi) py = this->yi;
+        if(py > this->yf) py = this->yf;
+
+        // Griglia orizzontale (grigio, tratteggiata)
+        svg << "  <line x1=\"" << this->xi << "\" y1=\"" << py << "\" x2=\"" << this->xf << "\" y2=\"" << py 
+            << "\" stroke=\"rgb(200,200,200)\" stroke-width=\"1\" stroke-dasharray=\"4,4\"/>\n";
+
+        // Tacchetta verso sinistra
+        svg << "  <line x1=\"" << this->xi << "\" y1=\"" << py << "\" x2=\"" << this->xi - 5 << "\" y2=\"" << py 
+            << "\" stroke=\"black\" stroke-width=\"1\"/>\n";
+
+        // Etichetta numerica (allineata a destra rispetto all'asse)
+        std::string label = formatNumber(yTicks[i]);
+        // y è sfalsato di +4px per centrare verticalmente la baseline del testo con la linea della griglia
+        svg << "  <text x=\"" << this->xi - 8 << "\" y=\"" << py + 4 
+            << "\" font-family=\"Consolas, monospace\" font-size=\"11\" text-anchor=\"end\" fill=\"black\">" 
+            << label << "</text>\n";
+    }
+
+    // 3. Disegna il Box che racchiude il grafico
+    svg << "  <rect x=\"" << this->xi << "\" y=\"" << this->yi 
+        << "\" width=\"" << (this->xf - this->xi) << "\" height=\"" << (this->yf - this->yi) 
+        << "\" fill=\"none\" stroke=\"black\" stroke-width=\"1\"/>\n";
+
+    // Array dei colori (ricalca esattamente i colori usati nel tuo WM_PAINT)
+    const char* colors[] = {"black", "red", "blue", "green", "cyan", "black", "black", "black", "black", "black"};
+
+    // 4. Disegna i dati usando le polilinee
+    for (size_t i = 0; i < mdata.size(); ++i) {
+        // Inizia una polilinea con il colore e lo spessore corretti
+        svg << "  <polyline fill=\"none\" stroke=\"" << colors[i % MAX_COLOR] 
+            << "\" stroke-width=\"" << this->lineWidth << "\" points=\"";
+        
+        // Stampa le coordinate di tutti i punti
+        for (size_t j = 0; j < mdata[i].size(); ++j) {
+            svg << Tx(mdata[i][j].x) << "," << Ty(mdata[i][j].y) << " ";
+        }
+        svg << "\"/>\n"; // Chiude la polilinea
+    }
+
+    svg << "</svg>\n"; // Chiude il file SVG
+    svg.close();
 }
 
 

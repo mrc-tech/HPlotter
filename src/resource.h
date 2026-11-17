@@ -10,6 +10,7 @@
 #define IDM_DXF				107
 #define IDM_OPEN			1001
 #define IDM_EXPORT_PNG		1002
+#define IDM_EXPORT_SVG		1003
 
 #define IDM_OPTIONS			108 // menu opzioni
 #define IDD_OPTIONS_DIALOG	109

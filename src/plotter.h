@@ -42,6 +42,8 @@ class Plotter
 		bool isDarkMode() const { return darkMode; }
 		void setDarkMode(bool dark) { darkMode = dark; }
 		
+		void exportToSVG(const char* filepath, int width, int height); // esporta in SVG
+		
 		int showWindow(HINSTANCE hInstance,int nCmdShow);
 		int showWindow();
 		void closeWindow();
